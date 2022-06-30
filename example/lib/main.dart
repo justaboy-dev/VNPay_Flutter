@@ -43,6 +43,8 @@ class _ExampleState extends State<Example> {
           'https://abc.com/return', //https://sandbox.vnpayment.vn/apis/docs/huong-dan-tich-hop/#code-returnurl
       ipAdress: '192.168.10.10',
       vnpayHashKey: 'XXX', //vnpay hash key, get from vnpay
+      vnPayHashType: VNPayHashType
+          .HMACSHA512, //hash type. Default is HmacSHA512, you can chang it in: https://sandbox.vnpayment.vn/merchantv2
     );
     VNPAYFlutter.instance.show(
       paymentUrl: paymentUrl,

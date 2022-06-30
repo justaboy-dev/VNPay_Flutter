@@ -19,7 +19,6 @@ Run pub get command
   flutter pub get
 ```
 
-Change hashtype to SHA256 at https://sandbox.vnpayment.vn/merchantv2/
 ## Usage/Examples
 
 ```dart
@@ -33,6 +32,8 @@ final paymentUrl = VNPAYFlutter.instance.generatePaymentUrl(
       returnUrl: 'https://abc.com/return', //https://sandbox.vnpayment.vn/apis/docs/huong-dan-tich-hop/#code-returnurl
       ipAdress: '192.168.10.10', //Your IP address
       vnpayHashKey: 'XXX', //vnpay hash key, get from vnpay
+      vnPayHashType: VNPayHashType
+          .HMACSHA512, //hash type. Default is HmacSHA512, you can chang it in: https://sandbox.vnpayment.vn/merchantv2
     );
 VNPAYFlutter.instance.show(
    paymentUrl: paymentUrl,

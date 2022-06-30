@@ -5,6 +5,11 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+enum VNPayHashType {
+  SHA256,
+  HMACSHA512,
+}
+
 class VNPAYFlutter {
   static final VNPAYFlutter _instance = VNPAYFlutter();
   static VNPAYFlutter get instance => _instance;
@@ -31,6 +36,7 @@ class VNPAYFlutter {
     required String ipAdress,
     String? createAt,
     required String vnpayHashKey,
+    VNPayHashType vnPayHashType = VNPayHashType.HMACSHA512,
   }) {
     final params = <String, dynamic>{
       'vnp_Version': version,
@@ -54,13 +60,21 @@ class VNPAYFlutter {
       hashDataBuffer.write(value);
       hashDataBuffer.write('&');
     });
-    final hashData =
+    String hashData =
         hashDataBuffer.toString().substring(0, hashDataBuffer.length - 1);
-    final query = Uri(queryParameters: sortedParam).query;
-    var bytes = utf8.encode(vnpayHashKey + hashData.toString());
-    final vnpSecureHash = sha256.convert(bytes);
-    final paymentUrl =
-        "$url?$query&vnp_SecureHashType=SHA256&vnp_SecureHash=$vnpSecureHash";
+    String query = Uri(queryParameters: sortedParam).query;
+    String vnpSecureHash = "";
+
+    if (vnPayHashType == VNPayHashType.SHA256) {
+      List<int> bytes = utf8.encode(vnpayHashKey + hashData.toString());
+      vnpSecureHash = sha256.convert(bytes).toString();
+    } else {
+      vnpSecureHash = Hmac(sha512, utf8.encode(vnpayHashKey))
+          .convert(utf8.encode(hashData))
+          .toString();
+    }
+    String paymentUrl =
+        "$url?$query&vnp_SecureHashType=${vnPayHashType == VNPayHashType.HMACSHA512 ? "HmacSHA512" : "SHA256"}&vnp_SecureHash=$vnpSecureHash";
     return paymentUrl;
   }
 
