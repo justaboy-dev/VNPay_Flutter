@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -8,6 +9,17 @@ import 'package:url_launcher/url_launcher_string.dart';
 enum VNPayHashType {
   SHA256,
   HMACSHA512,
+}
+
+extension VNPayHashTypeExt on VNPayHashType {
+  String toValueString(){
+    switch (this) {
+      case VNPayHashType.SHA256:
+        return 'SHA256';
+      case VNPayHashType.HMACSHA512:
+        return 'HmacSHA512';
+    }
+  }
 }
 
 class VNPAYFlutter {
@@ -34,11 +46,13 @@ class VNPAYFlutter {
     required double amount,
     required String returnUrl,
     required String ipAdress,
-    String? createAt,
+    DateTime? createAt,
     required String vnpayHashKey,
     VNPayHashType vnPayHashType = VNPayHashType.HMACSHA512,
+    String vnpayOrderType = 'other',
+    required DateTime vnpayExpireDate,
   }) {
-    final params = <String, dynamic>{
+    final params = <String, String>{
       'vnp_Version': version,
       'vnp_Command': command,
       'vnp_TmnCode': tmnCode,
@@ -49,8 +63,9 @@ class VNPAYFlutter {
       'vnp_Amount': (amount * 100).toStringAsFixed(0),
       'vnp_ReturnUrl': returnUrl,
       'vnp_IpAddr': ipAdress,
-      'vnp_CreateDate': createAt ??
-          DateFormat('yyyyMMddHHmmss').format(DateTime.now()).toString(),
+      'vnp_CreateDate': DateFormat('yyyyMMddHHmmss').format(createAt ?? DateTime.now()).toString(),
+      'vnp_OrderType': vnpayOrderType,
+      'vnp_ExpireDate': DateFormat('yyyyMMddHHmmss').format(vnpayExpireDate).toString(),
     };
     var sortedParam = _sortParams(params);
     final hashDataBuffer = StringBuffer();
@@ -60,25 +75,22 @@ class VNPAYFlutter {
       hashDataBuffer.write(value);
       hashDataBuffer.write('&');
     });
-    String hashData =
-        hashDataBuffer.toString().substring(0, hashDataBuffer.length - 1);
-    String query = Uri(queryParameters: sortedParam).query;
+    String hashData = hashDataBuffer.toString().substring(0, hashDataBuffer.length - 1);
+    String query = sortedParam.entries.map((e) => '${e.key}=${e.value}').join('&');//Uri(host: url, queryParameters: sortedParam).query;
     String vnpSecureHash = "";
 
     if (vnPayHashType == VNPayHashType.SHA256) {
       List<int> bytes = utf8.encode(vnpayHashKey + hashData.toString());
       vnpSecureHash = sha256.convert(bytes).toString();
-    } else {
-      vnpSecureHash = Hmac(sha512, utf8.encode(vnpayHashKey))
-          .convert(utf8.encode(hashData))
-          .toString();
+    } else if (vnPayHashType == VNPayHashType.HMACSHA512) {
+      vnpSecureHash = Hmac(sha512, utf8.encode(vnpayHashKey)).convert(utf8.encode(hashData)).toString();
     }
-    String paymentUrl =
-        "$url?$query&vnp_SecureHashType=${vnPayHashType == VNPayHashType.HMACSHA512 ? "HmacSHA512" : "SHA256"}&vnp_SecureHash=$vnpSecureHash";
+    String paymentUrl = "$url?$query&vnp_SecureHashType=${vnPayHashType.toValueString()}&vnp_SecureHash=$vnpSecureHash";
+    debugPrint("=====>[PAYMENT URL]: $paymentUrl");
     return paymentUrl;
   }
 
-  void show({
+  Future<void> show({
     required String paymentUrl,
     Function(Map<String, dynamic>)? onPaymentSuccess,
     Function(Map<String, dynamic>)? onPaymentError,
