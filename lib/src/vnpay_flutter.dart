@@ -1,13 +1,19 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:flutter_webview_plugin_ios_android/flutter_webview_plugin_ios_android.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 enum VNPayHashType {
   SHA256,
   HMACSHA512,
+}
+
+enum BankCode {
+  VNPAYQR,
+  VNBANK,
+  INTCARD
 }
 
 extension VNPayHashTypeExt on VNPayHashType {
@@ -49,6 +55,7 @@ class VNPAYFlutter {
     required String vnpayHashKey,
     VNPayHashType vnPayHashType = VNPayHashType.HMACSHA512,
     String vnpayOrderType = 'other',
+    BankCode? bankCode,
     required DateTime vnpayExpireDate,
   }) {
     final params = <String, String>{
@@ -66,6 +73,9 @@ class VNPAYFlutter {
       'vnp_OrderType': vnpayOrderType,
       'vnp_ExpireDate': DateFormat('yyyyMMddHHmmss').format(vnpayExpireDate).toString(),
     };
+    if(bankCode != null){
+      params['vnp_BankCode'] = bankCode.name;
+    }
     var sortedParam = _sortParams(params);
     final hashDataBuffer = StringBuffer();
     sortedParam.forEach((key, value) {
