@@ -10,7 +10,7 @@ Add this to you package's pubspec.yaml file:
 
 ```bash
   dependencies:
-    vnpay_flutter: ^1.0.0
+    vnpay_flutter: ^1.0.3
 ```
 
 Run pub get command
