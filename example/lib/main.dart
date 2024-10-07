@@ -69,7 +69,7 @@ class _ExampleState extends State<Example> {
             Text('Response Code: $responseCode'),
             TextButton(
               onPressed: onPayment,
-              child: const Text('10.000VND'),
+              child: const Text('30.000VND'),
             ),
           ],
         ),

@@ -4,16 +4,16 @@ version: 1.0.2
 homepage: https://github.com/justaboy-dev/VNPay_Flutter.git
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=2.10.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_webview_plugin: ^0.4.0
+  flutter_webview_plugin_ios_android: ^0.3.13+12
   crypto: ^3.0.2
   url_launcher: ^6.1.3
-  intl: ^0.17.0
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
