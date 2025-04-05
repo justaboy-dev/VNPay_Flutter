@@ -121,7 +121,7 @@ class VNPAYFlutter {
   Future<void> show({
     required BuildContext context,
     required String paymentUrl,
-    String appBarTitle = 'Payment',
+    String? appBarTitle,
     Function(Map<String, dynamic>)? onPaymentSuccess,
     Function(Map<String, dynamic>)? onPaymentError,
     Function()? onWebPaymentComplete,
@@ -153,20 +153,22 @@ class VNPAYFlutter {
         }
       });
 
-      Navigator.of(context).push(
+      await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => SafeArea(
             child: Scaffold(
               backgroundColor: Colors.white,
-              appBar: AppBar(
-                title: Text(
-                  appBarTitle,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+              appBar: appBarTitle != null
+                  ? AppBar(
+                      title: Text(
+                        appBarTitle,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    )
+                  : null,
               body: WebviewScaffold(
                 url: paymentUrl,
                 onBackPress: () {
