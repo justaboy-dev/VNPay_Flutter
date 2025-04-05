@@ -36,6 +36,7 @@ final paymentUrl = VNPAYFlutter.instance.generatePaymentUrl(
           .HMACSHA512, //hash type. Default is HmacSHA512, you can chang it in: https://sandbox.vnpayment.vn/merchantv2
     );
 VNPAYFlutter.instance.show(
+   context: context,
    paymentUrl: paymentUrl,
    onPaymentSuccess: (params) {}, //on mobile transaction success
    onPaymentError: (params) {}, //on mobile transaction error

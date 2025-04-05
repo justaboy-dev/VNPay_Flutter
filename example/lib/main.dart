@@ -48,6 +48,7 @@ class _ExampleState extends State<Example> {
       vnpayExpireDate: DateTime.now().add(const Duration(hours: 1)),
     );
     await VNPAYFlutter.instance.show(
+      context: context,
       paymentUrl: paymentUrl,
       onPaymentSuccess: (params) {
         setState(() {

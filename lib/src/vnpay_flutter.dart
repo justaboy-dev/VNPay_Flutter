@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin_ios_android/flutter_webview_plugin_ios_android.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -26,14 +28,12 @@ extension VNPayHashTypeExt on VNPayHashType {
   }
 }
 
-
 //[VNPAYFlutter] instance class VNPAY Flutter
 class VNPAYFlutter {
   static final VNPAYFlutter _instance = VNPAYFlutter();
 
-    //[instance] Single Ton Init
+  //[instance] Single Ton Init
   static VNPAYFlutter get instance => _instance;
-
 
   Map<String, dynamic> _sortParams(Map<String, dynamic> params) {
     final sortedParams = <String, dynamic>{};
@@ -43,7 +43,6 @@ class VNPAYFlutter {
     }
     return sortedParams;
   }
-
 
   //[generatePaymentUrl] Generate payment Url with input parameters
   String generatePaymentUrl({
@@ -115,9 +114,18 @@ class VNPAYFlutter {
     return paymentUrl;
   }
 
-  //[show] show payment url and return result on callback
+  /// Show payment webview
+  ///
+  /// [onPaymentSuccess], [onPaymentError] callback when payment success, error on app
+  /// [onWebPaymentComplete] callback when payment complete on web
   Future<void> show({
+    required BuildContext context,
     required String paymentUrl,
+    String? appBarTitle,
+    TextStyle appBarTitleStyle = const TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+    ),
     Function(Map<String, dynamic>)? onPaymentSuccess,
     Function(Map<String, dynamic>)? onPaymentError,
     Function()? onWebPaymentComplete,
@@ -145,9 +153,33 @@ class VNPAYFlutter {
             }
           }
           flutterWebviewPlugin.close();
+          Navigator.of(context).pop();
         }
       });
-      flutterWebviewPlugin.launch(paymentUrl);
+
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SafeArea(
+            child: Scaffold(
+              backgroundColor: Colors.white,
+              appBar: appBarTitle != null
+                  ? AppBar(
+                      title: Text(
+                        appBarTitle,
+                        style: appBarTitleStyle,
+                      ),
+                    )
+                  : null,
+              body: WebviewScaffold(
+                url: paymentUrl,
+                onBackPress: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ),
+        ),
+      );
     }
   }
 }
