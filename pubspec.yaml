@@ -1,6 +1,6 @@
 name: vnpay_flutter
 description: A flutter package support to Intergrate with VNPay, Platform support are Android, iOS, Web. Using webview to integrate
-version: 1.0.3
+version: 2.0.0
 homepage: https://github.com/justaboy-dev/VNPay_Flutter.git
 
 environment:
