@@ -122,6 +122,10 @@ class VNPAYFlutter {
     required BuildContext context,
     required String paymentUrl,
     String? appBarTitle,
+    TextStyle appBarTitleStyle = const TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+    ),
     Function(Map<String, dynamic>)? onPaymentSuccess,
     Function(Map<String, dynamic>)? onPaymentError,
     Function()? onWebPaymentComplete,
@@ -162,10 +166,7 @@ class VNPAYFlutter {
                   ? AppBar(
                       title: Text(
                         appBarTitle,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: appBarTitleStyle,
                       ),
                     )
                   : null,
